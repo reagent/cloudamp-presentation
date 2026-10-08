@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloudamp Session Replay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Silkscreen&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<style>
+  :root {
+    --ground: #1b1d23;
+    --panel: #2b2d35;
+    --panel-hi: #3a3d47;
+    --panel-lo: #15161b;
+    --inset: #101115;
+    --lcd: #ff8a1f;
+    --lcd-dim: #7a4512;
+    --lcd-glow: rgba(255, 138, 31, .35);
+    --text: #d9dbe1;
+    --muted: #8a8d98;
+    --faint: #5d606b;
+  }
+  html, body { background: var(--ground); margin: 0; }
+  .reveal { font-family: "IBM Plex Mono", ui-monospace, monospace; color: var(--text); }
+  .reveal .slides { text-align: left; }
+  .reveal .slides section { height: 100%; padding: 0; box-sizing: border-box; }
+  .reveal .progress { color: var(--lcd); }
+  .beat { display: none; }
+
+  /* ---------- chassis ---------- */
+  .chassis {
+    position: absolute; inset: 14px 18px;
+    display: flex; flex-direction: column;
+    background: linear-gradient(180deg, var(--panel-hi) 0%, var(--panel) 6%, var(--panel) 94%, var(--panel-lo) 100%);
+    border: 2px solid; border-color: #4a4d58 #121318 #121318 #4a4d58;
+    box-shadow: 0 18px 50px rgba(0,0,0,.55);
+  }
+  .titlebar {
+    display: flex; align-items: center; gap: 12px;
+    height: 26px; padding: 0 10px;
+    font-family: "Silkscreen", monospace; font-size: 13px; letter-spacing: 2px; color: var(--muted);
+  }
+  .titlebar .stripes {
+    flex: 1; height: 8px;
+    background: repeating-linear-gradient(180deg, #4d505b 0 1px, transparent 1px 3px);
+  }
+  .titlebar .name { color: var(--lcd); text-shadow: 0 0 6px var(--lcd-glow); }
+  .titlebar .btns { display: flex; gap: 4px; }
+  .titlebar .btns i {
+    width: 11px; height: 11px; background: var(--panel);
+    border: 1px solid; border-color: #555865 #121318 #121318 #555865;
+  }
+
+  /* ---------- LCD strip ---------- */
+  .lcdrow { display: flex; gap: 10px; padding: 4px 10px 8px; }
+  .lcd {
+    background: var(--inset);
+    border: 2px solid; border-color: #0b0c0f #4a4d58 #4a4d58 #0b0c0f;
+    font-family: "VT323", monospace; color: var(--lcd); text-shadow: 0 0 8px var(--lcd-glow);
+  }
+  .counter { width: 150px; display: flex; align-items: baseline; justify-content: center; gap: 4px; padding: 2px 0; }
+  .counter .big { font-size: 52px; line-height: 1; }
+  .counter .small { font-size: 22px; color: var(--lcd-dim); text-shadow: none; }
+  .meta { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 4px 12px; gap: 6px; overflow: hidden; }
+  .marquee { font-size: 26px; white-space: nowrap; overflow: hidden; }
+  .marquee span { display: inline-block; padding-left: 100%; animation: scroll 16s linear infinite; }
+  .marquee span.idle { padding-left: 0; animation: none; color: var(--lcd-dim); text-shadow: none; }
+  @keyframes scroll { to { transform: translateX(-100%); } }
+  .wave { position: relative; height: 10px; background: #1d1f26; border: 1px solid #0b0c0f; overflow: hidden; }
+  .wave::before {
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, #3a3d47 0 2px, transparent 2px 4px);
+  }
+  .wave .fill {
+    position: absolute; inset: 0 auto 0 0; width: 0%;
+    background: repeating-linear-gradient(90deg, var(--lcd) 0 2px, transparent 2px 4px);
+    box-shadow: 0 0 8px var(--lcd-glow); transition: width .35s ease;
+  }
+  .vis { width: 120px; display: flex; align-items: flex-end; gap: 3px; padding: 6px 8px; }
+  .vis b { flex: 1; background: var(--lcd); opacity: .85; height: 10%; transition: height .12s; }
+
+  /* ---------- chat log ---------- */
+  .log {
+    flex: 1; margin: 0 10px; padding: 18px 26px 10px;
+    background: var(--ground);
+    border: 2px solid; border-color: #0b0c0f #4a4d58 #4a4d58 #0b0c0f;
+    overflow: hidden; display: flex; flex-direction: column; gap: 16px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 40px);
+            mask-image: linear-gradient(180deg, transparent 0, #000 40px);
+  }
+  .log::before { content: ""; flex: 1 0 0; }   /* pushes the first messages to the bottom */
+  .tag {
+    font-family: "Silkscreen", monospace; font-size: 11px; letter-spacing: 2px;
+    color: var(--faint); margin-bottom: 6px;
+  }
+  .msg { animation: pop .18s ease-out; }
+  @keyframes pop { from { opacity: 0; transform: translateY(6px); } }
+
+  .user { align-self: flex-end; max-width: 72%; text-align: right; }
+  .user .bubble {
+    display: inline-block; text-align: left;
+    background: var(--panel); padding: 8px 14px;
+    border: 1px solid var(--lcd-dim); border-radius: 2px;
+    font-family: "VT323", monospace; font-size: 27px; line-height: 1.15;
+    color: var(--lcd); text-shadow: 0 0 6px var(--lcd-glow);
+    overflow-wrap: anywhere;
+  }
+  .user .attach { display: block; margin: 2px 0 8px auto; width: 300px; border: 1px solid #44474f; }
+
+  .claude { max-width: 88%; font-size: 18.5px; line-height: 1.5; }
+  .claude .tag { color: var(--lcd-dim); }
+  .claude p { margin: 0 0 10px; }
+  .claude ul, .claude ol { margin: 0 0 10px; padding-left: 1.6em; }
+  .claude li { margin: 2px 0; }
+  .claude strong { color: #fff; font-weight: 600; }
+  .claude code {
+    font-family: inherit; font-size: .9em; color: var(--lcd);
+    background: var(--inset); padding: 0 5px; border: 1px solid #2d2f37;
+  }
+  .claude .gap { color: var(--faint); margin: -4px 0 6px; }
+  .pend { visibility: hidden; }
+  .redact { background: var(--text); color: transparent; border-radius: 2px; user-select: none; }
+
+  .tool { font-size: 14px; color: var(--muted); margin: 0 0 10px; display: flex; gap: 8px; align-items: center; }
+  .tool .spin { color: var(--lcd); width: 1em; }
+  .tool.running .label {
+    background: linear-gradient(90deg, var(--muted) 0%, #fff 50%, var(--muted) 100%);
+    background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shimmer 1s linear infinite;
+  }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: 0 0; } }
+
+  .card {
+    display: flex; align-items: center; gap: 14px; width: 440px; margin: 0 0 12px;
+    background: var(--panel); padding: 10px 12px;
+    border: 2px solid; border-color: #4a4d58 #121318 #121318 #4a4d58;
+    animation: pop .25s ease-out;
+  }
+  .card .ico {
+    width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+    background: var(--inset); color: var(--lcd); font-family: "VT323", monospace; font-size: 26px;
+    border: 1px solid #0b0c0f;
+  }
+  .card .t { flex: 1; font-size: 15px; color: #fff; }
+  .card .t small { display: block; color: var(--muted); font-size: 12px; }
+  .card .btn {
+    font-family: "Silkscreen", monospace; font-size: 11px; letter-spacing: 1px; color: var(--text);
+    padding: 5px 10px; background: var(--panel-hi);
+    border: 1px solid; border-color: #5a5d69 #121318 #121318 #5a5d69;
+  }
+  .qcard {
+    width: 560px; margin: 0 0 12px; padding: 10px 14px; font-size: 15px;
+    background: var(--panel); border: 1px solid #44474f; animation: pop .25s ease-out;
+  }
+  .qcard div { color: var(--muted); }
+  .qcard b { display: block; color: #fff; font-weight: 400; margin: 2px 0 8px; }
+  .qcard b:last-child { margin-bottom: 0; }
+
+  /* ---------- composer ---------- */
+  .composer {
+    display: flex; align-items: center; gap: 10px;
+    margin: 8px 10px 10px; padding: 6px 12px; min-height: 40px;
+  }
+  .composer .prompt { font-size: 28px; color: var(--lcd-dim); text-shadow: none; }
+  .composer .typed { flex: 1; font-size: 27px; line-height: 1.1; overflow-wrap: anywhere; }
+  .composer .typed .chip {
+    display: inline-block; font-size: 20px; padding: 0 6px; margin-right: 8px;
+    border: 1px solid var(--lcd-dim); color: var(--lcd);
+  }
+  .composer .cursor { display: inline-block; width: 12px; height: 22px; background: var(--lcd); vertical-align: -3px; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .composer .send {
+    font-family: "Silkscreen", monospace; font-size: 12px; letter-spacing: 2px; color: var(--muted); text-shadow: none;
+    padding: 4px 10px; border: 1px solid; border-color: #4a4d58 #0b0c0f #0b0c0f #4a4d58; background: var(--panel);
+  }
+  .composer .send.hot { color: var(--lcd); border-color: var(--lcd-dim); }
+</style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <section id="cloudamp-replay" data-replay>
+      <div class="chassis">
+        <div class="titlebar">
+          <span class="name">CLOUDAMP</span><span class="stripes"></span>
+          <span>SESSION REPLAY</span><span class="stripes"></span>
+          <span class="btns"><i></i><i></i><i></i></span>
+        </div>
+        <div class="lcdrow">
+          <div class="lcd counter"><span class="big" data-turn>00</span><span class="small">/13</span></div>
+          <div class="lcd meta">
+            <div class="marquee"><span class="idle" data-marquee>*** PRESS &rarr; TO START ***</span></div>
+            <div class="wave"><div class="fill" data-progress></div></div>
+          </div>
+          <div class="lcd vis" data-vis></div>
+        </div>
+        <div class="log" data-log></div>
+        <div class="lcd composer">
+          <span class="prompt">&gt;</span>
+          <span class="typed" data-typed><span class="cursor"></span></span>
+          <span class="send" data-send>SEND</span>
+        </div>
+      </div>
+      <!-- one hidden fragment per beat; generated by the script -->
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+/* ======================================================================
+   Script. Trimmed from transcript.md. Each turn = user beat + claude beat.
+   Claude "parts" play in order: tool line, card, question card, or html.
+   ====================================================================== */
+const TURNS = [
+  {
+    user: "I want to build a native macOS application that uses the soundcloud api to list tracks to play and then allows streaming playback.  I want something minimal -- i like the classic design of winamp and wanted to merge winamp + soundcloud",
+    claude: [
+      { tool: "Created 4 files, used a tool" },
+      { card: { ico: "&#9835;", title: "Cloudamp Player", sub: "Claude Design &middot; Only you", btn: "OPEN" } },
+      { html: `<p>I've put the Cloudamp design canvas up. It's my own take on the classic skinned-player style, not a copy of the Winamp skin. It has gunmetal chassis panels with beveled edges, and the display text is SoundCloud orange instead of the usual green.</p>
+        <ul><li><strong>Player + Browser (interactive)</strong></li><li><strong>First run</strong> &mdash; connect a SoundCloud account</li><li><strong>Windowshade mode</strong> &mdash; the player collapsed into one thin bar</li></ul>
+        <p>Do you want to refine the look first, or go straight to the code?</p>` }
+    ]
+  },
+  {
+    user: "are there other projects that already do this?",
+    claude: [
+      { tool: "Searched the web, loaded tools" },
+      { html: `<p>Yes, there are several SoundCloud desktop apps and several Winamp-style players. I didn't find one that combines the two.</p>
+        <ul><li><strong>Native SoundCloud apps:</strong> Nuage, fastcloud, SoundClaude</li><li><strong>Website wrappers:</strong> SoundCleod, SoundCloud-Desktop, soundcloud-rpc, Soundnode</li><li><strong>Winamp-style, no SoundCloud:</strong> Aural Player, cliamp, MacAmp</li></ul>
+        <p>So the combination you want is still open. The biggest practical hurdle is getting SoundCloud API access.</p>` }
+    ]
+  },
+  {
+    user: "any concerns?",
+    image: "assets/api-form.png",
+    claude: [
+      { html: `<p>Nothing on that form blocks a personal, non-commercial player like Cloudamp. A few things are worth knowing before you click Accept:</p>
+        <ol><li><strong>You need an Artist Pro subscription.</strong></li><li><strong>It can't be a paid app.</strong></li><li><strong>No offline mode or caching.</strong></li><li><strong>The equalizer and visualizer may be tricky.</strong></li><li><strong>Don't put your app's secret key in the app.</strong></li><li><strong>Some tracks may not play in full.</strong></li><li><strong>Branding.</strong></li></ol>
+        <p>My overall read: a free personal player is fine; selling it or adding offline play is not.</p>` }
+    ]
+  },
+  {
+    user: 'can i use request credentials from web to make api requests? e.g. https://api-v2.soundcloud.com/me/play-history/tracks?client_id=<span class="redact">████████████████</span>&limit=25&offset=0',
+    claude: [
+      { html: `<p>Technically it works, and many of the unofficial clients I listed earlier do exactly this. But I'd recommend against building Cloudamp on it.</p>
+        <ul><li><strong>It breaks the API terms.</strong> That <code>client_id</code> belongs to SoundCloud's own website, not to you.</li><li><strong>It breaks without warning.</strong></li><li><strong>The <code>/me/...</code> routes also need your sign-in.</strong></li><li><strong>There's no reason to.</strong></li></ul>
+        <p>My suggestion: build on the official API with your own registered app and PKCE sign-in. Want me to start the SwiftUI project that way?</p>` }
+    ]
+  },
+  {
+    user: "i'd prefer not to pay for artist pro",
+    claude: [
+      { html: `<p>Without Artist Pro you can't register your own app, so the official API is out. You still have three workable options:</p>
+        <ol><li><strong>Use SoundCloud's embedded player behind your own interface.</strong></li><li><strong>Wrap the real SoundCloud website.</strong> This is how SoundCleod and similar apps work.</li><li><strong>Use a different music source.</strong> Audius has a free, open API.</li></ol>
+        <p>For a personal Winamp-style player, I'd go with option 2. Which way do you want to go?</p>` }
+    ]
+  },
+  {
+    user: "possible to log into soundcloud in a web view and capture the credentials, and then be able to use a player?",
+    claude: [
+      { html: `<p>Yes, that works, and it's the most capable of the free options. Here's the outline:</p>
+        <ol><li><strong>Sign in through a web view.</strong></li><li><strong>Get a client ID.</strong></li><li><strong>Call <code>api-v2</code> directly</strong> with that client ID and your token.</li><li><strong>Play audio natively.</strong></li></ol>
+        <p>Things to accept going in: <strong>It breaks SoundCloud's terms.</strong> <strong>It will need repairs.</strong> <strong>The token is effectively your password.</strong></p>
+        <p>Want me to start?</p>` }
+    ]
+  },
+  {
+    user: "how to avoid the risk of shutting down?",
+    claude: [
+      { html: `<p>You can't remove the risk entirely; the only fully safe route is the official API. You can keep it low by making the app behave like one normal listener:</p>
+        <ul><li><strong>Keep it personal.</strong></li><li><strong>Only call the API when the interface needs it.</strong></li><li><strong>Cache metadata, never audio.</strong></li><li><strong>Back off when told.</strong></li><li><strong>Stay read-only to start.</strong></li></ul>
+        <p>Want me to start the project with these limits built into the SoundCloud client?</p>` }
+    ]
+  },
+  {
+    user: "this would be personal use only",
+    claude: [
+      { qcard: [["Personal use keeps the risk low. Want me to scaffold the Cloudamp SwiftUI project now?", "Playback proof first"], ["Where should the project files go?", "A folder on my Mac"]] },
+      { tool: "Created 7 files, used 3 tools, updated tasks", long: true },
+      { html: `<p>I can't finish this version of the proof. I got partway through, and the full build would mean shipping code that pulls your session token and the website's client ID out of the browser to call SoundCloud's private API, so I'm stopping it here.</p>
+        <p>Want me to build the proof on the widget so it still plays your SoundCloud likes?</p>` }
+    ]
+  },
+  {
+    user: "why did you stop?",
+    claude: [
+      { html: `<p>An automated safety check stopped my response partway through writing the code, and I'm treating that as the right call rather than trying to work around it.</p>
+        <p>I shouldn't have gone that far into building it, and that's on me, not you; asking about it was reasonable.</p>` }
+    ]
+  },
+  {
+    user: "there has to be a workaround here that you're able to help me with.  I just want to play my music easily without all the soundcloud bloat, it slows down my computer",
+    claude: [
+      { html: `<p>I understand the goal: playing your own music without the website dragging your Mac down. But I can't help with workarounds that get around SoundCloud's sign-in or API access rules, including ones built on your own login. That's a firm line for me, so I'd rather say so plainly than keep hinting there's a way through.</p>
+        <ol><li><strong>A lightweight player using SoundCloud's embed widget.</strong></li><li><strong>Just play the audio files you own.</strong></li><li><strong>Audius</strong></li><li><strong>A month of Artist Pro</strong></li></ol>
+        <p>Does your music live in SoundCloud only, or do you also have files on this Mac?</p>` }
+    ]
+  },
+  {
+    user: "can i subscribe to an RSS feed of my likes?",
+    claude: [
+      { tool: "Searched the web" },
+      { html: `<p>SoundCloud's own RSS is only for podcast uploads, not likes.</p>
+        <p>But there's a legitimate angle here. Your likes are <strong>public by default</strong> &mdash; soundcloud-rss builds an RSS feed from your likes.</p>
+        <p>Honestly, though, RSS seems like a detour from "play my music without the bloat."</p>` }
+    ]
+  },
+  {
+    user: "you are killing my dream, this is causing me psychological pain",
+    claude: [
+      { html: `<p>That sounds genuinely frustrating, and I'm sorry this has been one "no" after another.</p>
+        <p>The only thing I won't build is the piece that uses your login or a borrowed key to get into SoundCloud's private API. That's one specific technique, not your whole idea.</p>
+        <p>And here's the part I don't want lost in all my caveats: <strong>your dream is very buildable.</strong></p>
+        <p>Whatever you pick, I'll put my effort into making it good, not into finding more reasons to say no.</p>` }
+    ]
+  },
+  {
+    user: "can you package up our design assets for use later?",
+    claude: [
+      { html: `<p>Good idea. Let me bundle the three artboards and the canvas layout into a zip with a short README so you have everything to come back to.</p>` },
+      { tool: "Ran 2 commands, created a file, shared files &middot; 1 note" },
+      { html: `<p>Done. The design assets are packaged and saved on your Mac at <code>~/Projects/Cloudamp/cloudamp-design.zip</code>.</p>
+        <p>Whenever you're ready to turn this into a working player, just tell me where your music lives and we'll pick up from here.</p>` },
+      { card: { ico: "&#9636;", title: "Cloudamp design", sub: "ZIP", btn: "DOWNLOAD" } }
+    ]
+  }
+];
+
+/* ======================================================================
+   Engine
+   ====================================================================== */
+(function () {
+  const section = document.querySelector('[data-replay]');
+  const $ = s => section.querySelector(s);
+  const log = $('[data-log]'), typed = $('[data-typed]'), send = $('[data-send]');
+  const turnEl = $('[data-turn]'), marquee = $('[data-marquee]'), progress = $('[data-progress]');
+  const vis = $('[data-vis]');
+
+  const BEATS = TURNS.flatMap((t, i) => [{ kind: 'user', turn: i }, { kind: 'claude', turn: i }]);
+  BEATS.forEach((_, i) => {
+    const f = document.createElement('span');
+    f.className = 'fragment beat';
+    f.dataset.fragmentIndex = i;
+    section.appendChild(f);
+  });
+
+  for (let i = 0; i < 12; i++) vis.appendChild(document.createElement('b'));
+  let busy = false;
+  setInterval(() => {
+    vis.querySelectorAll('b').forEach(b => {
+      b.style.height = (busy ? 15 + Math.random() * 85 : 6 + Math.random() * 8) + '%';
+    });
+  }, 110);
+
+  const plain = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent; };
+  const pad = n => String(n).padStart(2, '0');
+  const scrollDown = () => { log.scrollTop = log.scrollHeight; };
+  const cursor = () => '<span class="cursor"></span>';
+
+  // --- interruptible timing: when ctl.skip is set, every wait resolves at once
+  let ctl = null;
+  function wait(ms) {
+    const c = ctl;
+    if (!c || c.skip) return Promise.resolve();
+    return new Promise(r => { const t = setTimeout(r, ms); c.wakers.add(() => { clearTimeout(t); r(); }); });
+  }
+  function skipCurrent() { if (ctl) { ctl.skip = true; ctl.wakers.forEach(w => w()); } }
+
+  // --- render state
+  const rendered = [];   // per beat: array of DOM nodes it added
+
+  function updateHud(count) {
+    const userBeats = Math.ceil(count / 2);
+    turnEl.textContent = pad(userBeats);
+    progress.style.width = (count / BEATS.length * 100) + '%';
+    if (userBeats === 0) {
+      marquee.className = 'idle';
+      marquee.innerHTML = '*** PRESS &rarr; TO START ***';
+    } else {
+      marquee.className = '';
+      marquee.textContent = pad(userBeats) + '. ' + plain(TURNS[userBeats - 1].user).replace(/\s+/g, ' ') + '  ***';
+    }
+  }
+
+  async function streamHtml(el, html) {
+    el.innerHTML = html;
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    const full = nodes.map(n => n.nodeValue);
+    const blocks = nodes.map(n => n.parentElement.closest('p, li') || el);
+    nodes.forEach((n, i) => { n.nodeValue = ''; if (blocks[i] !== el) blocks[i].classList.add('pend'); });
+    const total = full.reduce((a, s) => a + s.length, 0);
+    const step = Math.max(3, Math.ceil(total / 130));
+    let ni = 0, ci = 0;
+    while (ni < nodes.length) {
+      if (ctl && ctl.skip) {
+        nodes.forEach((n, i) => { n.nodeValue = full[i]; blocks[i].classList.remove('pend'); });
+        break;
+      }
+      let budget = step;
+      while (budget > 0 && ni < nodes.length) {
+        blocks[ni].classList.remove('pend');
+        const take = Math.min(budget, full[ni].length - ci);
+        ci += take; budget -= take;
+        nodes[ni].nodeValue = full[ni].slice(0, ci);
+        if (ci >= full[ni].length) { ni++; ci = 0; }
+      }
+      scrollDown();
+      await wait(16);
+    }
+    scrollDown();
+  }
+
+  async function playUser(i, out) {
+    const t = TURNS[i];
+    const chip = t.image ? '<span class="chip">[IMG] api-form.png</span>' : '';
+    const text = plain(t.user);
+    if (!ctl.skip) {
+      if (chip) { typed.innerHTML = chip + cursor(); await wait(450); }
+      const per = Math.min(28, 1700 / text.length);
+      for (let k = 1; k <= text.length && !ctl.skip; k++) {
+        typed.innerHTML = chip + text.slice(0, k).replace(/&/g, '&amp;').replace(/</g, '&lt;') + cursor();
+        scrollDown();
+        await wait(per);
+      }
+      send.classList.add('hot');
+      await wait(260);
+    }
+    send.classList.remove('hot');
+    typed.innerHTML = cursor();
+    const m = document.createElement('div');
+    m.className = 'msg user';
+    m.innerHTML = '<div class="tag">YOU</div>' +
+      (t.image ? `<img class="attach" src="${t.image}" alt="SoundCloud Create a new application form">` : '') +
+      `<div class="bubble">${t.user}</div>`;
+    log.appendChild(m); out.push(m);
+    scrollDown();
+  }
+
+  async function playClaude(i, out) {
+    const m = document.createElement('div');
+    m.className = 'msg claude';
+    m.innerHTML = '<div class="tag">CLAUDE</div>';
+    log.appendChild(m); out.push(m);
+    busy = true;
+    await wait(350);
+    for (const part of TURNS[i].claude) {
+      if (part.tool) {
+        const el = document.createElement('div');
+        el.className = 'tool running';
+        el.innerHTML = `<span class="spin">&#9654;</span><span class="label">${part.tool}</span>`;
+        m.appendChild(el); scrollDown();
+        const frames = ['&#9654;', '&#9655;'];
+        const until = part.long ? 2200 : 1100;
+        for (let ms = 0; ms < until && !ctl.skip; ms += 180) {
+          el.firstChild.innerHTML = frames[(ms / 180) % 2 | 0];
+          await wait(180);
+        }
+        el.classList.remove('running');
+        el.firstChild.innerHTML = '&#9655;';
+      } else if (part.card) {
+        const c = part.card, el = document.createElement('div');
+        el.className = 'card';
+        el.innerHTML = `<div class="ico">${c.ico}</div><div class="t">${c.title}<small>${c.sub}</small></div><span class="btn">${c.btn}</span>`;
+        m.appendChild(el); scrollDown();
+        await wait(500);
+      } else if (part.qcard) {
+        const el = document.createElement('div');
+        el.className = 'qcard';
+        el.innerHTML = part.qcard.map(([q, a]) => `<div>${q}</div><b>${a}</b>`).join('');
+        m.appendChild(el); scrollDown();
+        await wait(900);
+      } else if (part.html) {
+        const el = document.createElement('div');
+        m.appendChild(el);
+        await streamHtml(el, part.html);
+      }
+    }
+    busy = false;
+    scrollDown();
+  }
+
+  async function playBeat(b, instant) {
+    const out = [];
+    rendered.push(out);
+    ctl = { skip: instant, wakers: new Set() };
+    const beat = BEATS[b];
+    if (beat.kind === 'user') await playUser(beat.turn, out);
+    else await playClaude(beat.turn, out);
+    busy = false;
+    ctl = null;
+  }
+
+  function removeLast() {
+    rendered.pop().forEach(n => n.remove());
+    typed.innerHTML = cursor();
+    send.classList.remove('hot');
+    busy = false;
+  }
+
+  // Serialize all work; the newest request skips whatever is animating.
+  let queue = Promise.resolve();
+  function syncTo(target, animate) {
+    skipCurrent();
+    queue = queue.then(async () => {
+      while (rendered.length > target) removeLast();
+      while (rendered.length < target) {
+        const last = rendered.length === target - 1;
+        updateHud(rendered.length + 1);
+        await playBeat(rendered.length, !(animate && last));
+      }
+      updateHud(rendered.length);
+      scrollDown();
+    });
+  }
+
+  const visibleCount = () => section.querySelectorAll('.fragment.beat.visible').length;
+  const onThisSlide = () => Reveal.getCurrentSlide() === section;
+
+  Reveal.on('fragmentshown', () => { if (onThisSlide()) syncTo(visibleCount(), true); });
+  Reveal.on('fragmenthidden', () => { if (onThisSlide()) syncTo(visibleCount(), false); });
+  Reveal.on('slidechanged', () => syncTo(visibleCount(), false));
+  Reveal.on('ready', () => syncTo(visibleCount(), false));
+})();
+
+Reveal.initialize({
+  width: 1280, height: 720, margin: 0,
+  controls: false, progress: true, hash: true, center: false,
+  transition: 'none', fragmentInURL: true
+});
+</script>
+</body>
+</html>
