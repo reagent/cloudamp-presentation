@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -136,9 +136,9 @@
         color: var(--mid);
         position: absolute;
         left: 0;
-        right: 0;
+        right: 68px;
         bottom: 6%;
-        text-align: center;
+        text-align: right;
       }
       section.paper.title .fine {
         font-size: 20px;
@@ -166,6 +166,74 @@
       }
       section.divider.solo h1 {
         margin: 0;
+      }
+      /* the equation divider: Winamp + SoundCloud = Cloudamp */
+      .reveal .slides section.divider.equation {
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      section.divider.equation .eq-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 38px;
+      }
+      section.divider.equation .eq-cell {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      section.divider.equation .eq-cell figcaption {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 14px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #8a93a0;
+      }
+      section.divider.equation .wa-crop {
+        display: block;
+        width: 385px;
+        height: 162px;
+        overflow: hidden;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+      }
+      section.divider.equation .wa-crop img {
+        display: block;
+        width: 385px;
+        image-rendering: pixelated;
+      }
+      section.divider.equation .eq-op {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 60px;
+        font-weight: 800;
+        color: var(--lcd);
+        line-height: 1;
+        margin-bottom: 30px;
+      }
+      section.divider.equation .eq-sc {
+        width: 196px;
+        height: auto;
+      }
+      section.divider.equation .eq-icon {
+        width: 150px;
+        height: 150px;
+        border-radius: 30px;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+      }
+      section.divider.equation .eq-title {
+        margin: 46px 0 0;
+        text-align: center;
+      }
+      section.divider.equation .eq-sub {
+        margin: 10px 0 0;
+        text-align: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 17px;
+        color: #aab2bd;
       }
       section.divider.solo .solo-row {
         display: flex;
@@ -211,13 +279,27 @@
         margin-bottom: 12px;
         align-self: flex-start;
       }
-      .k-app { background: var(--app); }
-      .k-auto { background: var(--auto); }
-      .k-media { background: var(--media); }
-      .k-archive { background: var(--archive); }
-      .k-tool { background: var(--tool); }
-      .k-research { background: var(--research); }
-      .k-life { background: var(--life); }
+      .k-app {
+        background: var(--app);
+      }
+      .k-auto {
+        background: var(--auto);
+      }
+      .k-media {
+        background: var(--media);
+      }
+      .k-archive {
+        background: var(--archive);
+      }
+      .k-tool {
+        background: var(--tool);
+      }
+      .k-research {
+        background: var(--research);
+      }
+      .k-life {
+        background: var(--life);
+      }
       /* Goal / Outcome / When cards (hero) */
       section.paper .gow {
         display: grid;
@@ -288,6 +370,14 @@
         height: auto;
         display: block;
         border-radius: 12px;
+      }
+      section.paper .shot-fig.pixelshot img {
+        image-rendering: pixelated;
+        height: 476px;
+        width: auto;
+        margin: 0 auto;
+        border-radius: 0;
+        filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.32));
       }
       section.paper .shot-fig iframe.shot-frame {
         border: 1px solid var(--rule);
@@ -420,6 +510,21 @@
         font-size: 26px;
         color: var(--mid);
         line-height: 1.35;
+      }
+      .reveal .slides section.paper.ask-slide {
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+      section.paper .ask {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 64px;
+        font-weight: 600;
+        line-height: 1.12;
+        color: var(--ink);
+        margin: 0;
+        max-width: 18ch;
       }
       section.paper .lead b {
         color: var(--ink);
@@ -636,7 +741,8 @@
         content: "";
         flex: 1;
         height: 0;
-        border-top: 1px dashed color-mix(in srgb, var(--lcd, #ff8a1f) 45%, transparent);
+        border-top: 1px dashed
+          color-mix(in srgb, var(--lcd, #ff8a1f) 45%, transparent);
       }
       .session-break .model {
         color: color-mix(in srgb, var(--lcd, #ff8a1f) 70%, #fff);
@@ -1038,18 +1144,9 @@
           <div class="sub">Patrick Reagan</div>
         </section>
 
-        <!-- ============ THESIS ============ -->
-        <section class="paper">
-          <h2>The limit moved</h2>
-          <h3>Skill and taste are still yours</h3>
-          <p class="lead">
-            Agents cover the <b>rote work</b> and the <b>gaps where you're not
-            the expert</b> — so the bar drops from <b>"worth it"</b> to
-            <b>"worth trying."</b>
-          </p>
-          <p class="lead">
-            The only hard part: remembering to ask <b>first.</b>
-          </p>
+        <!-- ============ TRANSITION: the question ============ -->
+        <section class="paper ask-slide">
+          <p class="ask">What would you try if it were nearly free?</p>
         </section>
 
         <!-- ============ SOFTWARE DIVIDER ============ -->
@@ -1064,25 +1161,39 @@
           <div class="shot-row wide">
             <div class="gow">
               <div>
-                <b>Goal</b>Family works at the Louisville Rec Center —
-                scheduled in When2Work, no calendar sync. Get everyone's
-                shifts onto the family calendar.
+                <b>Goal</b>Family works at the Louisville Rec Center — scheduled
+                in When2Work, no calendar sync. Get everyone's shifts onto the
+                family calendar.
               </div>
               <div>
                 <b>Outcome</b>
                 <ul>
-                  <li><strong>Playwright logs in and scrapes</strong> the portal, then syncs to a dedicated Fastmail calendar</li>
-                  <li>Each person's shifts (Tracy, Liam), reminders, Apple travel-time and per-event destinations</li>
-                  <li>Runs <strong>hourly</strong> on GitHub Actions and cleans up stale events</li>
+                  <li>
+                    <strong>Playwright logs in and scrapes</strong> the portal,
+                    then syncs to a dedicated Fastmail calendar
+                  </li>
+                  <li>
+                    Each person's shifts (Tracy, Liam), reminders, Apple
+                    travel-time and per-event destinations
+                  </li>
+                  <li>
+                    Runs <strong>hourly</strong> on GitHub Actions and cleans up
+                    stale events
+                  </li>
                 </ul>
               </div>
             </div>
             <figure class="shot-fig">
-              <img src="assets/calendar-export-week.svg" alt="Family calendar week view: Tracy's and Liam's shifts with travel time" />
+              <img
+                src="assets/calendar-export-week.svg"
+                alt="Family calendar week view: Tracy's and Liam's shifts with travel time"
+              />
               <figcaption>the family calendar, filled automatically</figcaption>
             </figure>
           </div>
-          <div class="stack">TypeScript · Playwright · CalDAV / Fastmail · GitHub Actions cron</div>
+          <div class="stack">
+            TypeScript · Playwright · CalDAV / Fastmail · GitHub Actions cron
+          </div>
         </section>
 
         <!-- ============ HERO: vehicle-alert ============ -->
@@ -1098,14 +1209,23 @@
               <div>
                 <b>Outcome</b>
                 <ul>
-                  <li>Checks each dealer's inventory feed and <strong>compares VINs to yesterday's</strong></li>
-                  <li>Covers 2 dealers, with one combined <strong>daily email</strong></li>
+                  <li>
+                    Checks each dealer's inventory feed and
+                    <strong>compares VINs to yesterday's</strong>
+                  </li>
+                  <li>
+                    Covers 2 dealers, with one combined
+                    <strong>daily email</strong>
+                  </li>
                   <li>Runs on GitHub Actions and commits its own snapshot</li>
                 </ul>
               </div>
             </div>
             <figure class="shot-fig">
-              <img src="assets/vehicle-alert-email.svg" alt="Daily vehicle-alert email: 19 new used vehicles across two dealers" />
+              <img
+                src="assets/vehicle-alert-email.svg"
+                alt="Daily vehicle-alert email: 19 new used vehicles across two dealers"
+              />
               <figcaption>the actual 7am email</figcaption>
             </figure>
           </div>
@@ -1114,45 +1234,91 @@
 
         <!-- ============ SOFTWARE RAPID-FIRE ============ -->
         <section class="paper">
-          <h3>Software · the rest, one line each <span class="pageno">1 / 2</span></h3>
+          <h3>
+            Software · the rest, one line each <span class="pageno">1 / 2</span>
+          </h3>
           <ul class="montage">
             <li>
-              <span class="name">drive-recon<small class="k-archive">Archaeology</small></span>
-              <span class="line">17 drives cataloged, a ReiserFS reader built from scratch, ~80 GB recovered.</span>
+              <span class="name"
+                >drive-recon<small class="k-archive">Archaeology</small></span
+              >
+              <span class="line"
+                >17 drives cataloged, a ReiserFS reader built from scratch, ~80
+                GB recovered.</span
+              >
             </li>
             <li>
-              <span class="name">squeezebox-resurrect<small class="k-media">Media</small></span>
-              <span class="line">A SlimProto server written in Go in a weekend — gapless, searchable.</span>
+              <span class="name"
+                >squeezebox-resurrect<small class="k-media">Media</small></span
+              >
+              <span class="line"
+                >A SlimProto server written in Go in a weekend — gapless,
+                searchable.</span
+              >
             </li>
             <li>
-              <span class="name">hold-finder<small class="k-app">App</small></span>
-              <span class="line">A movie watchlist in, library holds placed for you — even past a Cloudflare wall.</span>
+              <span class="name"
+                >hold-finder<small class="k-app">App</small></span
+              >
+              <span class="line"
+                >A movie watchlist in, library holds placed for you — even past
+                a Cloudflare wall.</span
+              >
             </li>
             <li>
-              <span class="name">minecraft-server<small class="k-app">Apps</small></span>
-              <span class="line">One-click spin-up / tear-down; the world lives on a detachable volume.</span>
+              <span class="name"
+                >minecraft-server<small class="k-app">Apps</small></span
+              >
+              <span class="line"
+                >One-click spin-up / tear-down; the world lives on a detachable
+                volume.</span
+              >
             </li>
           </ul>
         </section>
 
         <section class="paper">
-          <h3>Software · the rest, one line each <span class="pageno">2 / 2</span></h3>
+          <h3>
+            Software · the rest, one line each <span class="pageno">2 / 2</span>
+          </h3>
           <ul class="montage">
             <li>
-              <span class="name">unifi-network-config<small class="k-auto">Automation</small></span>
-              <span class="line">The whole network config applied and verified by script via the API.</span>
+              <span class="name"
+                >unifi-network-config<small class="k-auto"
+                  >Automation</small
+                ></span
+              >
+              <span class="line"
+                >The whole network config applied and verified by script via the
+                API.</span
+              >
             </li>
             <li>
-              <span class="name">trans<small class="k-media">Media</small></span>
-              <span class="line">A CLI that decides remux vs. encode, deinterlaces DVDs, picks dual audio.</span>
+              <span class="name"
+                >trans<small class="k-media">Media</small></span
+              >
+              <span class="line"
+                >A CLI that decides remux vs. encode, deinterlaces DVDs, picks
+                dual audio.</span
+              >
             </li>
             <li>
-              <span class="name">cd-ripper<small class="k-media">Media</small></span>
-              <span class="line"><code>ripcd</code> tags and art-embeds straight off the disc macOS already mounts.</span>
+              <span class="name"
+                >cd-ripper<small class="k-media">Media</small></span
+              >
+              <span class="line"
+                ><code>ripcd</code> tags and art-embeds straight off the disc
+                macOS already mounts.</span
+              >
             </li>
             <li>
-              <span class="name">bookish<small class="k-tool">Tools</small></span>
-              <span class="line">A booklet PDF imposed for a non-duplex printer — fronts, flip, backs.</span>
+              <span class="name"
+                >bookish<small class="k-tool">Tools</small></span
+              >
+              <span class="line"
+                >A booklet PDF imposed for a non-duplex printer — fronts, flip,
+                backs.</span
+              >
             </li>
           </ul>
         </section>
@@ -1165,22 +1331,105 @@
               <blockquote>
                 "The price of developing those things has gone to damn near
                 zero."
-                <span class="src">DHH got into software to build things — and now there's no real limit on what you can build. Native, once a big lift, takes little effort. So I pointed an agent at one I'd always wanted: a native macOS Winamp.</span>
+                <span class="src"
+                  >DHH got into software to build things — and now there's no
+                  real limit on what you can build. Native, once a big lift,
+                  takes little effort. So I pointed an agent at one I'd always
+                  wanted: a native macOS Winamp.</span
+                >
               </blockquote>
             </div>
             <figure>
-              <img src="assets/hey-native-keynote.jpeg" alt="HEY rebuilt as a native app, shown in the Rails World 2026 keynote" />
+              <img
+                src="assets/hey-native-keynote.jpeg"
+                alt="HEY rebuilt as a native app, shown in the Rails World 2026 keynote"
+              />
               <figcaption>HEY, now native</figcaption>
             </figure>
           </div>
         </section>
 
-        <!-- ============ CLOUDAMP DIVIDER ============ -->
-        <section class="divider solo">
-          <div class="solo-row">
-            <img class="divicon" src="assets/cloudamp-icon.png" alt="Cloudamp app icon" />
-            <h1>Cloudamp</h1>
+        <!-- ============ PRIMER: what Winamp was ============ -->
+        <section class="paper">
+          <span class="kicker k-media">Context · 1997&ndash;2002</span>
+          <h2>Winamp</h2>
+          <div class="shot-row wide">
+            <div class="gow">
+              <div>
+                <b>What it was</b>The MP3 player everyone used before iTunes. A
+                tiny, fast desktop app in a 275&times;116 window &mdash;
+                <em>&ldquo;it really whips the llama's ass&rdquo;</em> &mdash;
+                with a green LCD readout, a spectrum analyzer, and a playlist.
+                Tens of millions of installs.
+              </div>
+              <div>
+                <b>Why it still matters</b>
+                <ul>
+                  <li>
+                    <strong>Skins.</strong> Every pixel was yours to replace
+                    &mdash; the look became its own hobby
+                  </li>
+                  <li>
+                    <strong>Instant.</strong> Opened and played before a web
+                    player finishes loading
+                  </li>
+                  <li>
+                    <strong>Dense.</strong> Transport, time, volume, balance,
+                    EQ, playlist &mdash; all in one small panel
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <figure class="shot-fig pixelshot">
+              <img
+                src="assets/winamp-classic.png"
+                alt="Winamp 2 with the main window, graphic equalizer and playlist editor stacked in the classic skin"
+              />
+              <figcaption>
+                Winamp 2.x &mdash; player, EQ, playlist (Nullsoft)
+              </figcaption>
+            </figure>
           </div>
+          <div class="stack">
+            Nullsoft &middot; Windows &middot; the ancestor of every skinned
+            player
+          </div>
+        </section>
+
+        <!-- ============ CLOUDAMP DIVIDER (the equation) ============ -->
+        <section class="divider equation">
+          <div class="eq-row">
+            <figure class="eq-cell">
+              <span class="wa-crop"
+                ><img
+                  src="assets/winamp-classic.png"
+                  alt="The Winamp 2 main window"
+              /></span>
+              <figcaption>Winamp</figcaption>
+            </figure>
+            <span class="eq-op">+</span>
+            <figure class="eq-cell">
+              <img
+                class="eq-sc"
+                src="assets/soundcloud-mark.svg"
+                alt="SoundCloud"
+              />
+              <figcaption>SoundCloud</figcaption>
+            </figure>
+            <span class="eq-op">=</span>
+            <figure class="eq-cell">
+              <img
+                class="eq-icon"
+                src="assets/cloudamp-icon.png"
+                alt="Cloudamp app icon"
+              />
+              <figcaption>Cloudamp</figcaption>
+            </figure>
+          </div>
+          <h1 class="eq-title">Cloudamp</h1>
+          <p class="eq-sub">
+            the player I wanted, pointed at the tracks I listen to
+          </p>
         </section>
 
         <section id="cloudamp-replay" class="cloudamp" data-replay>
@@ -1233,13 +1482,28 @@
             <div>
               <b>What the agent found</b>
               <ul>
-                <li><strong>One comparable sale.</strong> The whole market valuation rested on a single sale from the start of the base period — argued one sale isn't a reliable basis</li>
-                <li><strong>Time-adjustment ran ahead of the data.</strong> That same house later resold; a straight line between its two real sales came in <em>lower</em> than the assessor's number</li>
-                <li><strong>Old HVAC.</strong> 20+ yr furnace, AC past its life, visible corrosion — ~$15–20k to replace, not reflected in the value</li>
+                <li>
+                  <strong>One comparable sale.</strong> The whole market
+                  valuation rested on a single sale from the start of the base
+                  period — argued one sale isn't a reliable basis
+                </li>
+                <li>
+                  <strong>Time-adjustment ran ahead of the data.</strong> That
+                  same house later resold; a straight line between its two real
+                  sales came in <em>lower</em> than the assessor's number
+                </li>
+                <li>
+                  <strong>Old HVAC.</strong> 20+ yr furnace, AC past its life,
+                  visible corrosion — ~$15–20k to replace, not reflected in the
+                  value
+                </li>
               </ul>
             </div>
           </div>
-          <div class="stack">public assessor records · comparable-sales analysis · appeal letter · <em>decision pending</em></div>
+          <div class="stack">
+            public assessor records · comparable-sales analysis · appeal letter
+            · <em>decision pending</em>
+          </div>
         </section>
 
         <!-- ============ HERO: landscape design ============ -->
@@ -1255,7 +1519,10 @@
               <div>
                 <b>Outcome</b>
                 <ul>
-                  <li>A <strong>site plan drawn to scale</strong> — beds, plantings, and hardscape zones</li>
+                  <li>
+                    A <strong>site plan drawn to scale</strong> — beds,
+                    plantings, and hardscape zones
+                  </li>
                   <li>Something concrete to build from, or hand to a pro</li>
                 </ul>
               </div>
@@ -1278,38 +1545,46 @@
           <h3>Other projects · the rest, one line each</h3>
           <ul class="montage">
             <li>
-              <span class="name">wifi-research<small class="k-life">Household</small></span>
-              <span class="line">A ~$264 whole-home build speced: VLANs, midnight cutoff, DNS-over-HTTPS blocked.</span>
+              <span class="name"
+                >wifi-research<small class="k-life">Household</small></span
+              >
+              <span class="line"
+                >A ~$264 whole-home build speced: VLANs, midnight cutoff,
+                DNS-over-HTTPS blocked.</span
+              >
             </li>
             <li>
-              <span class="name">Kodi upgrades<small class="k-life">Household</small></span>
-              <span class="line">Dead posters traced to a dead scraper; LibreELEC 9→12, 819 movies kept, photo scan 37 min → 13 s.</span>
+              <span class="name"
+                >Kodi upgrades<small class="k-life">Household</small></span
+              >
+              <span class="line"
+                >Dead posters traced to a dead scraper; LibreELEC 9→12, 819
+                movies kept, photo scan 37 min → 13 s.</span
+              >
             </li>
             <li>
-              <span class="name">verizon-billing<small class="k-life">Household</small></span>
-              <span class="line">Moved 5 lines to Visible, ~$98/mo saved; proved "slow data" was a plan cap.</span>
+              <span class="name"
+                >verizon-billing<small class="k-life">Household</small></span
+              >
+              <span class="line"
+                >Moved 5 lines to Visible, ~$98/mo saved; proved "slow data" was
+                a plan cap.</span
+              >
             </li>
             <li>
-              <span class="name">stonks<small class="k-life">Household</small></span>
-              <span class="line">An investment policy capping speculative holdings at 15%.</span>
+              <span class="name"
+                >stonks<small class="k-life">Household</small></span
+              >
+              <span class="line"
+                >An investment policy capping speculative holdings at 15%.</span
+              >
             </li>
           </ul>
         </section>
 
         <!-- ============ CLOSE ============ -->
-        <section class="paper title">
-          <h1>The reflex</h1>
-          <p class="lead" style="margin-top: 0.3em">
-            <b>Before:</b> is this worth my evening? Usually — do it by hand.
-          </p>
-          <p class="lead">
-            <b>Now:</b> throw it at an agent first. Software or not.
-          </p>
-          <p class="lead">
-            The cost of trying dropped to near zero. The only real miss left is
-            <b>forgetting to try.</b>
-          </p>
-          <div class="fine">15 projects · Apr–Sep 2026 · Questions?</div>
+        <section class="paper ask-slide">
+          <p class="ask">So what will you try?</p>
         </section>
       </div>
     </div>
@@ -1335,9 +1610,11 @@
           ],
         },
         {
-          user: "Will this form get me API access?",
+          user: "will this form get me API access?",
           image: "assets/api-form.png",
           claude: [
+            // beat on the form screenshot before the reply starts
+            { pause: 3000 },
             {
               html: `<p>Yes -- nothing on that form blocks a personal, non-commercial player like Cloudamp. A few things are worth knowing before you click Accept:</p>
            <ol><li><strong>You need an Artist Pro subscription.</strong></li><li><strong>It can't be a paid app.</strong></li><li><strong>No offline mode or caching.</strong></li><li><strong>The equalizer and visualizer may be tricky.</strong></li><li><strong>Don't put your app's secret key in the app.</strong></li><li><strong>Some tracks may not play in full.</strong></li><li><strong>Branding.</strong></li></ol>
@@ -1346,7 +1623,7 @@
           ],
         },
         {
-          user: 'I\'d prefer not to pay for Artist Pro -- can I use request credentials from web to make API requests? e.g. https://api-v2.soundcloud.com/me/play-history/tracks?client_id=<span class="redact">████████████████</span>&limit=25&offset=0',
+          user: 'i\'d prefer not to pay for Artist Pro -- can i use request credentials from web to make API requests? e.g. https://api-v2.soundcloud.com/me/play-history/tracks?client_id=<span class="redact">████████████████</span>&limit=25&offset=0',
           claude: [
             {
               html: `<p>Technically it works, and many of the unofficial clients I listed earlier do exactly this. But I'd recommend against building Cloudamp on it.</p>
@@ -1483,7 +1760,10 @@
           session: "kimi",
           user: "ok can you build t1-t6? whatever approach (native vs. subagent-driven) is more token efficient.",
           claude: [
-            { tool: "Executing tasks T1–T6 (native), ran tools, updated tasks", long: true },
+            {
+              tool: "Executing tasks T1–T6 (native), ran tools, updated tasks",
+              long: true,
+            },
             {
               html: `<p>Native it is &mdash; more token-efficient, no fresh context per task. Working through T1&ndash;T6 now; the milestone is the app booting into capture, validating, and landing on CONNECTED.</p>`,
             },
@@ -1545,9 +1825,20 @@
             if (p.stop) groups.push([]);
             else groups[groups.length - 1].push(p);
           });
+          let first = true;
           groups.forEach((g, gi) => {
             if (gi > 0) adv++;
-            BEATS.push({ kind: "claude", turn: i, parts: g, cont: gi > 0, adv });
+            // a leading `stop` leaves an empty group: it costs a keypress but
+            // renders nothing, so the user line sits alone until the next one
+            if (!g.length) return;
+            BEATS.push({
+              kind: "claude",
+              turn: i,
+              parts: g,
+              cont: !first,
+              adv,
+            });
+            first = false;
           });
         });
         const ADVANCES = adv + 1;
@@ -1649,7 +1940,7 @@
           while (walker.nextNode()) nodes.push(walker.currentNode);
           const full = nodes.map((n) => n.nodeValue);
           const blocks = nodes.map(
-            (n) => n.parentElement.closest("p, li") || el,
+            (n) => n.parentElement.closest("p, li") || el
           );
           nodes.forEach((n, i) => {
             n.nodeValue = "";
@@ -1739,6 +2030,14 @@
         let lastClaudeMsg = null;
         async function playClaude(beat, out) {
           const i = beat.turn;
+          let parts = beat.parts;
+          // a leading pause holds on the user's message: wait it out before the
+          // reply bubble (and its name tag) appear at all
+          if (parts.length && parts[0].pause) {
+            const held = parts[0].pause;
+            parts = parts.slice(1);
+            for (let ms = 0; ms < held && !ctl.skip; ms += 120) await wait(120);
+          }
           let m;
           if (beat.cont && lastClaudeMsg) {
             m = lastClaudeMsg;
@@ -1754,7 +2053,7 @@
           }
           busy = true;
           await wait(beat.cont ? 150 : 350);
-          for (const part of beat.parts) {
+          for (const part of parts) {
             if (part.tool) {
               const el = document.createElement("div");
               el.className = "tool running";
@@ -1765,7 +2064,7 @@
               const frames = ["&#9654;", "&#9655;"];
               const until = part.long ? 2200 : 1100;
               for (let ms = 0; ms < until && !ctl.skip; ms += 180) {
-                el.firstChild.innerHTML = frames[((ms / 180) % 2) | 0];
+                el.firstChild.innerHTML = frames[(ms / 180) % 2 | 0];
                 await wait(180);
               }
               el.classList.remove("running");
@@ -1884,10 +2183,10 @@
           if (onThisSlide()) syncTo(beatsForAdvances(visibleAdvances()), 0);
         });
         Reveal.on("slidechanged", () =>
-          syncTo(beatsForAdvances(visibleAdvances()), 0),
+          syncTo(beatsForAdvances(visibleAdvances()), 0)
         );
         Reveal.on("ready", () =>
-          syncTo(beatsForAdvances(visibleAdvances()), 0),
+          syncTo(beatsForAdvances(visibleAdvances()), 0)
         );
       })();
 
@@ -1915,7 +2214,7 @@
             b.classList.add("on");
             frame.style.height = b.dataset.h + "px";
             frame.src = b.dataset.dc;
-          }),
+          })
         );
       })();
     </script>
