@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloudamp — Windowshade</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&amp;family=VT323&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#ff8a1f}a:hover{color:#ffb066}
+</style>
+</helmet>
+<div style="width: 640px; height: 160px; box-sizing: border-box; padding: 40px 45px; background: #1b1d23; display: flex; justify-content: center; align-items: center">
+<div style="width: 550px; height: 32px; background: #2b2d35; border: 2px solid; border-color: #4f5360 #121318 #121318 #4f5360; box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 0 8px">
+<div style="display: flex; gap: 5px">
+<div style="width: 9px; height: 9px; background: #e0533c; border: 1px solid #121318"></div>
+<div style="width: 9px; height: 9px; background: #e2a33a; border: 1px solid #121318"></div>
+<div style="width: 9px; height: 9px; background: #5aa84a; border: 1px solid #121318"></div>
+</div>
+<div style="font-family: 'Silkscreen', monospace; font-size: 9px; letter-spacing: 2px; color: #aeb2bf">CLOUDAMP</div>
+<div style="flex-grow: 1; height: 20px; background: #0c0805; border: 1px solid #121318; display: flex; align-items: center; padding: 0 6px; overflow: hidden">
+<div style="font-family: 'VT323', monospace; font-size: 17px; color: #ff8a1f; white-space: nowrap">1. HALDEN RUE — LOW TIDE STATIC</div>
+</div>
+<div style="font-family: 'VT323', monospace; font-size: 18px; color: #ff8a1f">01:42</div>
+<div style="display: flex; gap: 2px; color: #d6d9e2">
+<button aria-label="Previous track" style="width: 22px; height: 20px; padding: 0; background: #3a3d47; border: 1px solid; border-color: #5a5e6b #121318 #121318 #5a5e6b; color: inherit; display: flex; align-items: center; justify-content: center"><svg width="10" height="8" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="3"><path d="M3 1v12M16 1L6 7l10 6z"></path></svg></button>
+<button aria-label="Pause" style="width: 22px; height: 20px; padding: 0; background: #3a3d47; border: 1px solid; border-color: #5a5e6b #121318 #121318 #5a5e6b; color: #ff8a1f; display: flex; align-items: center; justify-content: center"><svg width="8" height="8" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 1v12M10 1v12"></path></svg></button>
+<button aria-label="Next track" style="width: 22px; height: 20px; padding: 0; background: #3a3d47; border: 1px solid; border-color: #5a5e6b #121318 #121318 #5a5e6b; color: inherit; display: flex; align-items: center; justify-content: center"><svg width="10" height="8" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 1v12M2 1l10 6-10 6z"></path></svg></button>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":640,"height":160}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

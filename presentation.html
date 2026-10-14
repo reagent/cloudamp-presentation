@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Throw It At the Agent First</title>
+    <title>The Only Limitation Is Your Imagination</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -167,6 +167,17 @@
       section.divider.solo h1 {
         margin: 0;
       }
+      section.divider.solo .solo-row {
+        display: flex;
+        align-items: center;
+        gap: 34px;
+      }
+      section.divider.solo .divicon {
+        width: 132px;
+        height: 132px;
+        border-radius: 24px;
+        box-shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
+      }
       section.divider h1 {
         font-family: "Fraunces", Georgia, serif;
         color: #f4f1ea;
@@ -277,6 +288,18 @@
         height: auto;
         display: block;
         border-radius: 12px;
+      }
+      section.paper .shot-fig iframe.shot-frame {
+        border: 1px solid var(--rule);
+        width: 1560px;
+        height: 1040px;
+        zoom: 0.4;
+        display: block;
+        background: #fff;
+        border-radius: 10px;
+      }
+      section.paper .gow.two {
+        grid-template-columns: 1fr 1.45fr;
       }
       section.paper .shot-fig figcaption {
         margin-top: 8px;
@@ -860,6 +883,90 @@
         color: var(--lcd);
         border-color: var(--lcd-dim);
       }
+      /* interactive design-canvas slide */
+      .reveal .slides section.dcanvas {
+        background: #14151a;
+        color: #c9ccd6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 40px 50px 24px;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+      }
+      section.dcanvas h2 {
+        font-family: "Silkscreen", monospace;
+        font-size: 28px;
+        color: #f4f1ea;
+        margin: 0 0 6px;
+        letter-spacing: 0.02em;
+      }
+      section.dcanvas .sub {
+        font-size: 16px;
+        color: #7e828e;
+        margin: 0 0 18px;
+      }
+      section.dcanvas .dc-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      section.dcanvas .dc-tabs button {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 14px;
+        letter-spacing: 0.05em;
+        color: #c9ccd6;
+        background: #2b2d35;
+        border: 1px solid;
+        border-color: #4f5360 #121318 #121318 #4f5360;
+        padding: 7px 16px;
+        cursor: pointer;
+      }
+      section.dcanvas .dc-tabs button.on {
+        color: #ff8a1f;
+        border-color: #ff8a1f #7a3f10 #7a3f10 #ff8a1f;
+      }
+      section.dcanvas .dc-stage {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+      }
+      section.dcanvas iframe {
+        border: 0;
+        width: 640px;
+        height: 860px;
+        zoom: 0.6;
+        background: #1b1d23;
+      }
+      /* interactive canvas frames embedded side-by-side in a chat message */
+      .chat-dc {
+        margin: 6px 0 10px;
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+      }
+      .chat-dc figure {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+      .chat-dc figcaption {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        color: #ff8a1f;
+      }
+      .chat-dc iframe {
+        border: 1px solid #44474f;
+        width: 640px;
+        zoom: 0.3;
+        background: #1b1d23;
+        display: block;
+      }
       /* interlude: the DHH detour */
       section.paper.interlude {
         justify-content: center;
@@ -1056,43 +1163,23 @@
             <div>
               <div class="eyebrow">A detour · DHH, Rails World 2026</div>
               <blockquote>
-                "HEY never really wanted to be a web app."
-                <span class="src">Dropping the web app for native — six HEY apps, started a week before the talk.</span>
+                "The price of developing those things has gone to damn near
+                zero."
+                <span class="src">DHH got into software to build things — and now there's no real limit on what you can build. Native, once a big lift, takes little effort. So I pointed an agent at one I'd always wanted: a native macOS Winamp.</span>
               </blockquote>
             </div>
             <figure>
-              <img src="assets/hey-native-keynote.jpeg" alt="HEY rebuilt as a native phone app, shown in the Rails World 2026 keynote" />
+              <img src="assets/hey-native-keynote.jpeg" alt="HEY rebuilt as a native app, shown in the Rails World 2026 keynote" />
               <figcaption>HEY, now native</figcaption>
             </figure>
           </div>
         </section>
 
-        <!-- ============ INTERLUDE: DHH detour (2 of 2) ============ -->
-        <section class="paper interlude">
-          <div class="cols flip">
-            <div>
-              <div class="eyebrow">A detour · DHH, Rails World 2026</div>
-              <blockquote>
-                "The price of developing those things has gone to damn near
-                zero."
-                <span class="src">Not a line of code — just a lot of prompts. So I pointed an agent at a native macOS Winamp.</span>
-              </blockquote>
-            </div>
-            <figure>
-              <img src="assets/hey-native-desktop.jpeg" alt="HEY as a native desktop app in the Rails World 2026 keynote" />
-              <figcaption>…and native on the desktop, too</figcaption>
-            </figure>
-          </div>
-        </section>
-
         <!-- ============ CLOUDAMP DIVIDER ============ -->
-        <section class="divider">
-          <h1>Cloudamp</h1>
-          <p>A Winamp-style SoundCloud player — and where the reflex meets a wall</p>
-          <div class="thesis">
-            Two sessions, two models. The build shipped a login milestone; a
-            later session drew a hard line at lifting credentials. Replayed live
-            on the next slide. <em>(→ advances one turn at a time)</em>
+        <section class="divider solo">
+          <div class="solo-row">
+            <img class="divicon" src="assets/cloudamp-icon.png" alt="Cloudamp app icon" />
+            <h1>Cloudamp</h1>
           </div>
         </section>
 
@@ -1128,20 +1215,67 @@
           <!-- one hidden fragment per beat; generated by the script -->
         </section>
 
-        <!-- ============ RESEARCH DIVIDER ============ -->
-        <section class="divider">
-          <h1>Research &amp; Household</h1>
-          <p>No code to ship — just a question and an answer</p>
-          <div class="thesis">
-            The reflex isn't only for software. Point an agent at a messy,
-            real-world question and it comes back with data, not a shrug.
-          </div>
+        <!-- ============ OTHER PROJECTS DIVIDER ============ -->
+        <section class="divider solo">
+          <h1>Other Projects</h1>
         </section>
 
-        <!-- ============ HERO: wage-divide ============ -->
-        <!-- ============ RESEARCH RAPID-FIRE ============ -->
+        <!-- ============ HERO: property-tax ============ -->
         <section class="paper">
-          <h3>Research &amp; household · one line each</h3>
+          <span class="kicker k-life">Household · appeal filed</span>
+          <h2>property-tax</h2>
+          <div class="gow two">
+            <div>
+              <b>Goal</b>Our assessment looked high. Check it against the public
+              records and, if the data backs it, appeal — asking for about a
+              <strong>6% reduction</strong>.
+            </div>
+            <div>
+              <b>What the agent found</b>
+              <ul>
+                <li><strong>One comparable sale.</strong> The whole market valuation rested on a single sale from the start of the base period — argued one sale isn't a reliable basis</li>
+                <li><strong>Time-adjustment ran ahead of the data.</strong> That same house later resold; a straight line between its two real sales came in <em>lower</em> than the assessor's number</li>
+                <li><strong>Old HVAC.</strong> 20+ yr furnace, AC past its life, visible corrosion — ~$15–20k to replace, not reflected in the value</li>
+              </ul>
+            </div>
+          </div>
+          <div class="stack">public assessor records · comparable-sales analysis · appeal letter · <em>decision pending</em></div>
+        </section>
+
+        <!-- ============ HERO: landscape design ============ -->
+        <section class="paper">
+          <span class="kicker k-life">Household · design</span>
+          <h2>landscape design</h2>
+          <div class="shot-row wide">
+            <div class="gow">
+              <div>
+                <b>Goal</b>Reimagine the yard without paying a landscape
+                architect up front.
+              </div>
+              <div>
+                <b>Outcome</b>
+                <ul>
+                  <li>A <strong>site plan drawn to scale</strong> — beds, plantings, and hardscape zones</li>
+                  <li>Something concrete to build from, or hand to a pro</li>
+                </ul>
+              </div>
+            </div>
+            <figure class="shot-fig">
+              <iframe
+                class="shot-frame"
+                src="assets/site-plan/SitePlan.dc.html"
+                title="Landscape site plan"
+                loading="lazy"
+              ></iframe>
+              <figcaption>the site plan, drawn to scale</figcaption>
+            </figure>
+          </div>
+          <div class="stack">design canvas · scaled site plan</div>
+        </section>
+
+        <!-- ============ OTHER PROJECTS RAPID-FIRE ============ -->
+        <section class="paper">
+          <h3>Other projects · the rest, one line each</h3>
           <ul class="montage">
             <li>
               <span class="name">wifi-research<small class="k-life">Household</small></span>
@@ -1154,10 +1288,6 @@
             <li>
               <span class="name">verizon-billing<small class="k-life">Household</small></span>
               <span class="line">Moved 5 lines to Visible, ~$98/mo saved; proved "slow data" was a plan cap.</span>
-            </li>
-            <li>
-              <span class="name">property-tax<small class="k-life">Household</small></span>
-              <span class="line">A full assessment-appeal packet — comps, deed records, letter — by the deadline.</span>
             </li>
             <li>
               <span class="name">stonks<small class="k-life">Household</small></span>
@@ -1195,18 +1325,7 @@
           user: "I want to build a native macOS application that uses the soundcloud api to list tracks to play and then allows streaming playback.  I want something minimal -- i like the classic design of winamp and wanted to merge winamp + soundcloud",
           claude: [
             { tool: "Created 4 files, used a tool" },
-            {
-              card: {
-                ico: "&#9835;",
-                title: "Cloudamp Player",
-                sub: "Claude Design &middot; Only you",
-                btn: "OPEN",
-              },
-            },
-            {
-              img: "assets/cloudamp-design.png",
-              cap: "Cloudamp player — original design canvas",
-            },
+            { dc: true },
             { stop: true },
             {
               html: `<p>I've put the Cloudamp design canvas up. It's my own take on the classic skinned-player style, not a copy of the Winamp skin. It has gunmetal chassis panels with beveled edges, and the display text is SoundCloud orange instead of the usual green.</p>
@@ -1679,6 +1798,30 @@
               out.push(el);
               scrollDown();
               await wait(500);
+            } else if (part.dc) {
+              const wrap = document.createElement("div");
+              wrap.className = "chat-dc";
+              const frames = [
+                ["First run", "assets/design-canvas/Connect.dc.html", 420],
+                ["Player + Browser", "assets/design-canvas/Main.dc.html", 860],
+                ["Windowshade", "assets/design-canvas/Shade.dc.html", 160],
+              ];
+              frames.forEach(([label, src, h]) => {
+                const fig = document.createElement("figure");
+                const frame = document.createElement("iframe");
+                frame.title = label;
+                frame.src = src;
+                frame.style.height = h + "px";
+                const cap = document.createElement("figcaption");
+                cap.textContent = label;
+                fig.appendChild(frame);
+                fig.appendChild(cap);
+                wrap.appendChild(fig);
+              });
+              m.appendChild(wrap);
+              out.push(wrap);
+              scrollDown();
+              await wait(600);
             } else if (part.pause) {
               for (let ms = 0; ms < part.pause && !ctl.skip; ms += 120)
                 await wait(120);
@@ -1759,6 +1902,22 @@
         transition: "none",
         fragmentInURL: true,
       });
+    </script>
+    <script>
+      // design-canvas frame switcher
+      (function () {
+        const tabs = document.querySelectorAll(".dcanvas .dc-tabs button");
+        const frame = document.querySelector(".dcanvas iframe[data-dc-frame]");
+        if (!frame || !tabs.length) return;
+        tabs.forEach((b) =>
+          b.addEventListener("click", () => {
+            tabs.forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            frame.style.height = b.dataset.h + "px";
+            frame.src = b.dataset.dc;
+          }),
+        );
+      })();
     </script>
   </body>
 </html>
