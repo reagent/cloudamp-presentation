@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="548" viewBox="0 0 760 548" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- card -->
+  <rect x="20" y="20" width="740" height="512" rx="14" fill="#1c1c1e" filter="url(#sh)"/>
+
+  <!-- title bar -->
+  <path d="M20 34 a14 14 0 0 1 14 -14 h712 a14 14 0 0 1 14 14 v20 h-740 z" fill="#2b2b2d"/>
+  <circle cx="44" cy="37" r="6" fill="#ff5f57"/>
+  <circle cx="64" cy="37" r="6" fill="#febc2e"/>
+  <circle cx="84" cy="37" r="6" fill="#28c840"/>
+  <text x="380" y="42" font-size="12.5" fill="#8e8e93" text-anchor="middle" font-weight="600">Week</text>
+  <text x="724" y="42" font-size="11.5" fill="#8e8e93" text-anchor="end">Mountain Time</text>
+
+  <!-- month -->
+  <text x="40" y="82" font-size="22" font-weight="800" fill="#f2f2f7">October <tspan fill="#8e8e93" font-weight="500">2026</tspan></text>
+
+  <!-- day headers -->
+  <g font-size="12" fill="#aeaeb2" text-anchor="middle">
+    <text x="110" y="106">Sun <tspan fill="#636366">11</tspan></text>
+    <text x="210" y="106">Mon <tspan fill="#636366">12</tspan></text>
+    <text x="310" y="106">Tue 13</text>
+    <text x="410" y="106">Wed <tspan fill="#636366">14</tspan></text>
+    <text x="510" y="106">Thu <tspan fill="#636366">15</tspan></text>
+    <text x="610" y="106">Fri <tspan fill="#636366">16</tspan></text>
+    <text x="710" y="106">Sat <tspan fill="#636366">17</tspan></text>
+  </g>
+  <!-- today pill on Tue 13 -->
+  <circle cx="326" cy="102" r="9" fill="#ff453a"/>
+  <text x="326" y="106" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">13</text>
+
+  <line x1="20" y1="113" x2="760" y2="113" stroke="#3a3a3c" stroke-width="1"/>
+
+  <!-- hour grid lines + labels (5AM..5PM, 28px/hr, 5AM at y=120) -->
+  <g stroke="#2c2c2e" stroke-width="1">
+    <line x1="60" y1="148" x2="760" y2="148"/>
+    <line x1="60" y1="204" x2="760" y2="204"/>
+    <line x1="60" y1="260" x2="760" y2="260"/>
+    <line x1="60" y1="316" x2="760" y2="316"/>
+    <line x1="60" y1="372" x2="760" y2="372"/>
+    <line x1="60" y1="428" x2="760" y2="428"/>
+    <line x1="60" y1="484" x2="760" y2="484"/>
+  </g>
+  <g font-size="9.5" fill="#636366" text-anchor="end">
+    <text x="52" y="151">6 AM</text>
+    <text x="52" y="207">8 AM</text>
+    <text x="52" y="263">10 AM</text>
+    <text x="52" y="319">Noon</text>
+    <text x="52" y="375">2 PM</text>
+    <text x="52" y="431">4 PM</text>
+  </g>
+  <!-- day separators -->
+  <g stroke="#2c2c2e" stroke-width="1">
+    <line x1="60" y1="113" x2="60" y2="500"/>
+    <line x1="160" y1="113" x2="160" y2="500"/>
+    <line x1="260" y1="113" x2="260" y2="500"/>
+    <line x1="360" y1="113" x2="360" y2="500"/>
+    <line x1="460" y1="113" x2="460" y2="500"/>
+    <line x1="560" y1="113" x2="560" y2="500"/>
+    <line x1="660" y1="113" x2="660" y2="500"/>
+  </g>
+
+  <!-- ============ EVENTS ============ -->
+  <!-- styles: liam = green, tracy = purple; title 8.5 bold, time 8 -->
+
+  <!-- Tue 13 (col left 260) -->
+  <rect x="264" y="393" width="92" height="28" rx="4" fill="#2a2550"/>
+  <rect x="264" y="393" width="3" height="28" fill="#5e5ce6"/>
+  <text x="271" y="404" font-size="8.5" font-weight="700" fill="#cfccff">[tracy] Balance &amp; Stab.</text>
+  <text x="271" y="415" font-size="8" fill="#a5a0e0">2:45 – 3:45 PM</text>
+
+  <rect x="264" y="435" width="92" height="28" rx="4" fill="#2a2550"/>
+  <rect x="264" y="435" width="3" height="28" fill="#5e5ce6"/>
+  <text x="271" y="446" font-size="8.5" font-weight="700" fill="#cfccff">[tracy] NIA Hybrid</text>
+  <text x="271" y="457" font-size="8" fill="#a5a0e0">4:15 – 5:15 PM</text>
+
+  <!-- Wed 14 (col left 360) : Rec Daytime 10AM-5PM -->
+  <rect x="364" y="260" width="92" height="196" rx="4" fill="#1e3a26"/>
+  <rect x="364" y="260" width="3" height="196" fill="#30d158"/>
+  <text x="371" y="275" font-size="8.5" font-weight="700" fill="#aef0c0">[liam] Rec Daytime LG</text>
+  <text x="371" y="287" font-size="8" fill="#7fce97">Louisville Rec &amp; Senior…</text>
+  <text x="371" y="299" font-size="8" fill="#7fce97">10 AM – 5 PM</text>
+
+  <!-- Thu 15 (col left 460) : Rec Daytime 10AM-4PM -->
+  <rect x="464" y="260" width="92" height="168" rx="4" fill="#1e3a26"/>
+  <rect x="464" y="260" width="3" height="168" fill="#30d158"/>
+  <text x="471" y="275" font-size="8.5" font-weight="700" fill="#aef0c0">[liam] Rec Daytime LG</text>
+  <text x="471" y="287" font-size="8" fill="#7fce97">Louisville Rec &amp; Senior…</text>
+  <text x="471" y="299" font-size="8" fill="#7fce97">10 AM – 4 PM</text>
+
+  <!-- Fri 16 (col left 560) : Rec Daytime 5:15-11AM -->
+  <rect x="564" y="127" width="92" height="161" rx="4" fill="#1e3a26"/>
+  <rect x="564" y="127" width="3" height="161" fill="#30d158"/>
+  <text x="571" y="142" font-size="8.5" font-weight="700" fill="#aef0c0">[liam] Rec Daytime LG</text>
+  <text x="571" y="154" font-size="8" fill="#7fce97">Louisville Rec &amp; Senior…</text>
+  <text x="571" y="166" font-size="8" fill="#7fce97">5:15 – 11 AM</text>
+
+  <!-- Sat 17 (col left 660) -->
+  <rect x="664" y="232" width="92" height="28" rx="4" fill="#2a2550"/>
+  <rect x="664" y="232" width="3" height="28" fill="#5e5ce6"/>
+  <text x="671" y="243" font-size="8.5" font-weight="700" fill="#cfccff">[tracy] NIA Hybrid</text>
+  <text x="671" y="254" font-size="8" fill="#a5a0e0">9 – 10 AM</text>
+
+  <rect x="664" y="274" width="92" height="28" rx="4" fill="#2a2550"/>
+  <rect x="664" y="274" width="3" height="28" fill="#5e5ce6"/>
+  <text x="671" y="285" font-size="8.5" font-weight="700" fill="#cfccff">[tracy] Cardio Drumming</text>
+  <text x="671" y="296" font-size="8" fill="#a5a0e0">10:30 – 11:30 AM</text>
+
+  <!-- footer tag -->
+  <rect x="40" y="504" width="210" height="22" rx="11" fill="#13351d"/>
+  <text x="145" y="519" font-size="11" font-weight="700" fill="#30d158" text-anchor="middle">synced hourly · travel time added</text>
+</svg>

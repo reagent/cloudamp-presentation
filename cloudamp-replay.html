@@ -239,6 +239,28 @@
       .msg {
         animation: pop 0.18s ease-out;
       }
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 6px 0 2px;
+        font-family: "Silkscreen", monospace;
+        font-size: 11px;
+        letter-spacing: 2px;
+        color: var(--lcd, #ff8a1f);
+        animation: pop 0.25s ease-out;
+      }
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 0;
+        border-top: 1px dashed color-mix(in srgb, var(--lcd, #ff8a1f) 45%, transparent);
+      }
+      .divider .model {
+        color: color-mix(in srgb, var(--lcd, #ff8a1f) 70%, #fff);
+        text-shadow: 0 0 6px var(--lcd-glow, transparent);
+      }
       @keyframes pop {
         from {
           opacity: 0;
@@ -488,7 +510,7 @@
             <div class="lcdrow">
               <div class="lcd counter">
                 <span class="big" data-turn>00</span
-                ><span class="small">/13</span>
+                ><span class="small" data-total>/13</span>
               </div>
               <div class="lcd meta">
                 <div class="marquee">
@@ -635,6 +657,84 @@
             },
           ],
         },
+
+        /* ===== appended: earlier build session (2026-10-01) — narrative level ===== */
+        {
+          session: "kimi",
+          user: "ok, i want to build a native mac application that connects to soundcloud to play audio files.  the first part i need to test out is login -- i want to open a web view, log into soundcloud, and then capture the tokens",
+          claude: [
+            { tool: "Used a skill, created 6 files, ran a tool" },
+            {
+              html: `<p>Built a login-capture spike to prove the first piece: an XcodeGen project, a SwiftUI shell, a sign-in window, a credential store backed by the macOS Keychain, and a <code>/me</code> check to confirm it worked.</p>
+           <p>The app is open. Sign in and browse around, then I'll verify the <code>/me</code> call came back authenticated.</p>`,
+            },
+          ],
+        },
+        {
+          session: "kimi",
+          user: "captured credentials is perfect -- if we cache credentials between runs, we should check to see if they are valid, and if not pop up the login capture screen",
+          claude: [
+            {
+              html: `<p>Right call. On launch the app reads the cached credentials and validates them against <code>/me</code>:</p>
+           <ul><li><strong>Valid</strong> &rarr; straight to the player, no sign-in.</li><li><strong>Missing or expired</strong> &rarr; the capture window opens.</li></ul>
+           <p>The token lives in the Keychain and is cleared on sign-out.</p>`,
+            },
+          ],
+        },
+        {
+          session: "kimi",
+          user: "yes looks good -- any way to help not trigger any abuse detection on soundcloud?",
+          claude: [
+            {
+              html: `<p>Yes &mdash; make it behave like one normal listener. Folded an etiquette section into the design:</p>
+           <ul><li><strong>No polling.</strong> The LCD and timer read the local player, so nothing hits the API while a track plays.</li><li><strong>Cache aggressively.</strong> Lists in memory, refreshed on launch or a manual pull.</li><li><strong>One page at a time.</strong> No parallel fan-out.</li><li><strong>Respect 429 + Retry-After.</strong> Back off with jitter, then surface OFFLINE and stop.</li><li><strong>Manual sign-in only.</strong></li></ul>
+           <p>Single-user volume is the whole defense: the request rate is the same as browsing in a tab.</p>`,
+            },
+          ],
+        },
+        {
+          session: "kimi",
+          user: "any way to lead with the credentials capture first?",
+          claude: [
+            {
+              tool: "Edited the plan, committed",
+            },
+            {
+              html: `<p>Good instinct &mdash; login is the riskiest piece and the spike already proves it works. Reordered the plan so capture leads:</p>
+           <ul><li><strong>T1&ndash;T5:</strong> scaffold &rarr; keychain &rarr; parsing &rarr; capture view &rarr; api client</li><li><strong>T6 = login milestone:</strong> boots NOT CONNECTED &rarr; capture &rarr; validate &rarr; Keychain &rarr; CONNECTED; relaunch skips login.</li><li><strong>T7&ndash;T16:</strong> likes, streams, player engine, views, wiring, smoke test.</li></ul>`,
+            },
+          ],
+        },
+        {
+          session: "kimi",
+          user: "ok can you build t1-t6? whatever approach (native vs. subagent-driven) is more token efficient.",
+          claude: [
+            { tool: "Executing tasks T1–T6 (native), ran tools, updated tasks", long: true },
+            {
+              html: `<p>Native it is &mdash; more token-efficient, no fresh context per task. Working through T1&ndash;T6 now; the milestone is the app booting into capture, validating, and landing on CONNECTED.</p>`,
+            },
+          ],
+        },
+        {
+          session: "kimi",
+          user: "i signed in just now and then closed app -- can you reopen?",
+          claude: [
+            { tool: "Reopened Cloudamp.app" },
+            {
+              html: `<p>Reopened. Does it come up <strong>CONNECTED</strong> straight away, or show the login screen?</p>`,
+            },
+          ],
+        },
+        {
+          session: "kimi",
+          user: "we're connected 👏",
+          claude: [
+            {
+              html: `<p>That's the login milestone proven end to end &mdash; cached credentials validated, Keychain working, no re-login on relaunch.</p>
+           <p>Next up: the likes list, stream URLs and the player engine.</p>`,
+            },
+          ],
+        },
       ];
 
       /* ======================================================================
@@ -645,17 +745,24 @@
         const $ = (s) => section.querySelector(s);
         const log = $("[data-log]"),
           typed = $("[data-typed]"),
-          send = $("[data-send]");
+          send = $("[data-send]"),
+          composer = $(".composer");
         const turnEl = $("[data-turn]"),
           marquee = $("[data-marquee]"),
           progress = $("[data-progress]");
         const vis = $("[data-vis]");
 
+        const totalEl = $("[data-total]");
+        if (totalEl)
+          totalEl.textContent = "/" + String(TURNS.length).padStart(2, "0");
+
         const BEATS = TURNS.flatMap((t, i) => [
           { kind: "user", turn: i },
           { kind: "claude", turn: i },
         ]);
-        BEATS.forEach((_, i) => {
+        // one fragment per TURN: a single advance types the user line, sends
+        // it, then auto-plays the agent reply (two beats).
+        TURNS.forEach((_, i) => {
           const f = document.createElement("span");
           f.className = "fragment beat";
           f.dataset.fragmentIndex = i;
@@ -682,6 +789,26 @@
           log.scrollTop = log.scrollHeight;
         };
         const cursor = () => '<span class="cursor"></span>';
+
+        // --- sessions: which model / where each turn came from
+        const SESSIONS = {
+          opus: { model: "Claude Opus 5.5", venue: "claude.ai" },
+          kimi: {
+            model: "Kimi K3",
+            venue: "Claude Code",
+            vars: {
+              "--lcd": "#2fd4d4",
+              "--lcd-dim": "#1a7a7a",
+              "--lcd-glow": "rgba(47, 212, 212, 0.35)",
+            },
+          },
+        };
+        const sidOf = (i) => TURNS[i].session || "opus";
+        function applyAccent(el, i) {
+          const v = SESSIONS[sidOf(i)].vars || {};
+          for (const k of ["--lcd", "--lcd-dim", "--lcd-glow"])
+            el.style.setProperty(k, v[k] || "");
+        }
 
         // --- interruptible timing: when ctl.skip is set, every wait resolves at once
         let ctl = null;
@@ -768,6 +895,18 @@
 
         async function playUser(i, out) {
           const t = TURNS[i];
+          applyAccent(composer, i);
+          // session divider when the model/source changes (or at the very start)
+          if (i === 0 || sidOf(i) !== sidOf(i - 1)) {
+            const s = SESSIONS[sidOf(i)];
+            const d = document.createElement("div");
+            d.className = "divider";
+            applyAccent(d, i);
+            d.innerHTML = `<span>NEW SESSION</span><span class="model">${s.model} &middot; ${s.venue}</span>`;
+            log.appendChild(d);
+            out.push(d);
+            scrollDown();
+          }
           const chip = t.image
             ? '<span class="chip">[IMG] api-form.png</span>'
             : "";
@@ -793,6 +932,7 @@
           typed.innerHTML = cursor();
           const m = document.createElement("div");
           m.className = "msg user";
+          applyAccent(m, i);
           m.innerHTML =
             '<div class="tag">YOU</div>' +
             (t.image
@@ -807,7 +947,9 @@
         async function playClaude(i, out) {
           const m = document.createElement("div");
           m.className = "msg claude";
-          m.innerHTML = '<div class="tag">CLAUDE</div>';
+          applyAccent(m, i);
+          const who = SESSIONS[sidOf(i)].model.toUpperCase();
+          m.innerHTML = `<div class="tag">${who}</div>`;
           log.appendChild(m);
           out.push(m);
           busy = true;
@@ -873,33 +1015,36 @@
         }
 
         // Serialize all work; the newest request skips whatever is animating.
+        // `target` is a BEAT count; `animateTail` beats at the end play live,
+        // the rest snap in instantly (for jumps / stepping back).
         let queue = Promise.resolve();
-        function syncTo(target, animate) {
+        function syncTo(target, animateTail) {
           skipCurrent();
           queue = queue.then(async () => {
             while (rendered.length > target) removeLast();
             while (rendered.length < target) {
-              const last = rendered.length === target - 1;
+              const animate = rendered.length >= target - (animateTail || 0);
               updateHud(rendered.length + 1);
-              await playBeat(rendered.length, !(animate && last));
+              await playBeat(rendered.length, !animate);
             }
             updateHud(rendered.length);
             scrollDown();
           });
         }
 
-        const visibleCount = () =>
+        // fragments are per-turn now, so each one maps to two beats
+        const visibleTurns = () =>
           section.querySelectorAll(".fragment.beat.visible").length;
         const onThisSlide = () => Reveal.getCurrentSlide() === section;
 
         Reveal.on("fragmentshown", () => {
-          if (onThisSlide()) syncTo(visibleCount(), true);
+          if (onThisSlide()) syncTo(visibleTurns() * 2, 2);
         });
         Reveal.on("fragmenthidden", () => {
-          if (onThisSlide()) syncTo(visibleCount(), false);
+          if (onThisSlide()) syncTo(visibleTurns() * 2, 0);
         });
-        Reveal.on("slidechanged", () => syncTo(visibleCount(), false));
-        Reveal.on("ready", () => syncTo(visibleCount(), false));
+        Reveal.on("slidechanged", () => syncTo(visibleTurns() * 2, 0));
+        Reveal.on("ready", () => syncTo(visibleTurns() * 2, 0));
       })();
 
       Reveal.initialize({
