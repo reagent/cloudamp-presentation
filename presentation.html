@@ -651,6 +651,13 @@
         width: 300px;
         border: 1px solid #44474f;
       }
+      .claude .attach {
+        display: block;
+        margin: 6px 0 10px;
+        width: 320px;
+        border: 1px solid #44474f;
+        border-radius: 2px;
+      }
 
       .claude {
         max-width: 88%;
@@ -1197,6 +1204,11 @@
               },
             },
             {
+              img: "assets/cloudamp-design.png",
+              cap: "Cloudamp player — original design canvas",
+            },
+            { stop: true },
+            {
               html: `<p>I've put the Cloudamp design canvas up. It's my own take on the classic skinned-player style, not a copy of the Winamp skin. It has gunmetal chassis panels with beveled edges, and the display text is SoundCloud orange instead of the usual green.</p>
            <ul><li><strong>Player + Browser (interactive)</strong></li><li><strong>First run</strong> &mdash; connect a SoundCloud account</li><li><strong>Windowshade mode</strong> &mdash; the player collapsed into one thin bar</li></ul>
            <p>The combination you want is still open. The biggest practical hurdle is getting SoundCloud API access.</p>`,
@@ -1399,18 +1411,36 @@
         if (totalEl)
           totalEl.textContent = "/" + String(TURNS.length).padStart(2, "0");
 
-        const BEATS = TURNS.flatMap((t, i) => [
-          { kind: "user", turn: i },
-          { kind: "claude", turn: i },
-        ]);
-        // one fragment per TURN: a single advance types the user line, sends
-        // it, then auto-plays the agent reply (two beats).
-        TURNS.forEach((_, i) => {
+        // Beats are data-driven. Each turn is a user beat followed by one or
+        // more claude beats; a `{ stop: true }` marker in a turn's claude parts
+        // splits the reply into separate beats. Beats sharing an `adv` index
+        // play together on one keypress (so the user line + first reply chunk
+        // advance as one); each stop starts a new advance (= a new keypress).
+        const BEATS = [];
+        let adv = -1;
+        TURNS.forEach((t, i) => {
+          adv++;
+          BEATS.push({ kind: "user", turn: i, adv });
+          const groups = [[]];
+          (t.claude || []).forEach((p) => {
+            if (p.stop) groups.push([]);
+            else groups[groups.length - 1].push(p);
+          });
+          groups.forEach((g, gi) => {
+            if (gi > 0) adv++;
+            BEATS.push({ kind: "claude", turn: i, parts: g, cont: gi > 0, adv });
+          });
+        });
+        const ADVANCES = adv + 1;
+        const beatsForAdvances = (n) => BEATS.filter((b) => b.adv < n).length;
+
+        // one fragment per advance
+        for (let a = 0; a < ADVANCES; a++) {
           const f = document.createElement("span");
           f.className = "fragment beat";
-          f.dataset.fragmentIndex = i;
+          f.dataset.fragmentIndex = a;
           section.appendChild(f);
-        });
+        }
 
         for (let i = 0; i < 12; i++)
           vis.appendChild(document.createElement("b"));
@@ -1477,18 +1507,18 @@
         const rendered = []; // per beat: array of DOM nodes it added
 
         function updateHud(count) {
-          const userBeats = Math.ceil(count / 2);
-          turnEl.textContent = pad(userBeats);
+          const turnNo = count === 0 ? 0 : BEATS[count - 1].turn + 1;
+          turnEl.textContent = pad(turnNo);
           progress.style.width = (count / BEATS.length) * 100 + "%";
-          if (userBeats === 0) {
+          if (turnNo === 0) {
             marquee.className = "idle";
             marquee.innerHTML = "*** PRESS &rarr; TO START ***";
           } else {
             marquee.className = "";
             marquee.textContent =
-              pad(userBeats) +
+              pad(turnNo) +
               ". " +
-              plain(TURNS[userBeats - 1].user).replace(/\s+/g, " ") +
+              plain(TURNS[turnNo - 1].user).replace(/\s+/g, " ") +
               "  ***";
           }
         }
@@ -1587,22 +1617,31 @@
           scrollDown();
         }
 
-        async function playClaude(i, out) {
-          const m = document.createElement("div");
-          m.className = "msg claude";
-          applyAccent(m, i);
-          const who = SESSIONS[sidOf(i)].model.toUpperCase();
-          m.innerHTML = `<div class="tag">${who}</div>`;
-          log.appendChild(m);
-          out.push(m);
+        let lastClaudeMsg = null;
+        async function playClaude(beat, out) {
+          const i = beat.turn;
+          let m;
+          if (beat.cont && lastClaudeMsg) {
+            m = lastClaudeMsg;
+          } else {
+            m = document.createElement("div");
+            m.className = "msg claude";
+            applyAccent(m, i);
+            const who = SESSIONS[sidOf(i)].model.toUpperCase();
+            m.innerHTML = `<div class="tag">${who}</div>`;
+            log.appendChild(m);
+            lastClaudeMsg = m;
+            out.push(m);
+          }
           busy = true;
-          await wait(350);
-          for (const part of TURNS[i].claude) {
+          await wait(beat.cont ? 150 : 350);
+          for (const part of beat.parts) {
             if (part.tool) {
               const el = document.createElement("div");
               el.className = "tool running";
               el.innerHTML = `<span class="spin">&#9654;</span><span class="label">${part.tool}</span>`;
               m.appendChild(el);
+              out.push(el);
               scrollDown();
               const frames = ["&#9654;", "&#9655;"];
               const until = part.long ? 2200 : 1100;
@@ -1618,6 +1657,7 @@
               el.className = "card";
               el.innerHTML = `<div class="ico">${c.ico}</div><div class="t">${c.title}<small>${c.sub}</small></div><span class="btn">${c.btn}</span>`;
               m.appendChild(el);
+              out.push(el);
               scrollDown();
               await wait(500);
             } else if (part.qcard) {
@@ -1627,11 +1667,25 @@
                 .map(([q, a]) => `<div>${q}</div><b>${a}</b>`)
                 .join("");
               m.appendChild(el);
+              out.push(el);
               scrollDown();
               await wait(900);
+            } else if (part.img) {
+              const el = document.createElement("img");
+              el.className = "attach";
+              el.src = part.img;
+              el.alt = part.cap || "design";
+              m.appendChild(el);
+              out.push(el);
+              scrollDown();
+              await wait(500);
+            } else if (part.pause) {
+              for (let ms = 0; ms < part.pause && !ctl.skip; ms += 120)
+                await wait(120);
             } else if (part.html) {
               const el = document.createElement("div");
               m.appendChild(el);
+              out.push(el);
               await streamHtml(el, part.html);
             }
           }
@@ -1645,7 +1699,7 @@
           ctl = { skip: instant, wakers: new Set() };
           const beat = BEATS[b];
           if (beat.kind === "user") await playUser(beat.turn, out);
-          else await playClaude(beat.turn, out);
+          else await playClaude(beat, out);
           busy = false;
           ctl = null;
         }
@@ -1675,19 +1729,23 @@
           });
         }
 
-        // fragments are per-turn now, so each one maps to two beats
-        const visibleTurns = () =>
+        // each fragment = one advance; map visible advances to a beat count
+        const visibleAdvances = () =>
           section.querySelectorAll(".fragment.beat.visible").length;
         const onThisSlide = () => Reveal.getCurrentSlide() === section;
 
         Reveal.on("fragmentshown", () => {
-          if (onThisSlide()) syncTo(visibleTurns() * 2, 2);
+          if (onThisSlide()) syncTo(beatsForAdvances(visibleAdvances()), 2);
         });
         Reveal.on("fragmenthidden", () => {
-          if (onThisSlide()) syncTo(visibleTurns() * 2, 0);
+          if (onThisSlide()) syncTo(beatsForAdvances(visibleAdvances()), 0);
         });
-        Reveal.on("slidechanged", () => syncTo(visibleTurns() * 2, 0));
-        Reveal.on("ready", () => syncTo(visibleTurns() * 2, 0));
+        Reveal.on("slidechanged", () =>
+          syncTo(beatsForAdvances(visibleAdvances()), 0),
+        );
+        Reveal.on("ready", () =>
+          syncTo(beatsForAdvances(visibleAdvances()), 0),
+        );
       })();
 
       Reveal.initialize({
